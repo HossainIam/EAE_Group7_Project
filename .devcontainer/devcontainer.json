@@ -1,0 +1,7 @@
+{
+    "name": "eaejava",
+    "dockerComposeFile": "./docker-compose.yml",
+    "service": "eaejava",
+    "workspaceFolder": "/workspace/",
+    "shutdownAction": "stopCompose"
+}
