@@ -1,47 +1,83 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head><title>Register</title></head>
+<head>
+  <title>Register</title>
+</head>
 <body>
+
 <h2>Register</h2>
 
 <form id="registerForm">
+
   <input name="FirstName" placeholder="First Name" /><br/><br/>
   <input name="LastName" placeholder="Last Name" /><br/><br/>
   <input name="email" placeholder="Email" /><br/><br/>
   <input name="password" type="password" placeholder="Password" /><br/><br/>
   <input name="NIDnumber" placeholder="National ID Number" /><br/><br/>
 
+  <label>
+    <input type="checkbox" name="hasCar" id="hasCar"> I have a car
+  </label><br><br>
+
+  <label>Driving License Number</label><br>
+  <input name="drivingLicenseNumber" id="dl" disabled><br><br>
+
+  <label>Car Number</label><br>
+  <input name="carNumber" id="carNo" disabled><br><br>
+
   <button type="submit">Create account</button>
   <a href="/login">Back to login</a>
+
 </form>
 
-<pre id="out"></pre>
+<p id="out"></p>
 
 <script>
-document.getElementById("registerForm").addEventListener("submit", async e => {
-  e.preventDefault();
-  const form = new FormData(e.target);
+  // toggle logic
+  const cb = document.getElementById("hasCar");
+  const dl = document.getElementById("dl");
+  const carNo = document.getElementById("carNo");
 
-  const data = {
-    FirstName: (form.get("FirstName") || "").trim(),
-    LastName: (form.get("LastName") || "").trim(),
-    email: (form.get("email") || "").trim(),
-    password: (form.get("password") || "").trim(),
-    NIDnumber: (form.get("NIDnumber") || "").trim()
-  };
+  cb.addEventListener("change", () => {
+    dl.disabled = !cb.checked;
+    carNo.disabled = !cb.checked;
 
-  const res = await fetch("/auth/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
+    if (!cb.checked) {
+      dl.value = "";
+      carNo.value = "";
+    }
   });
 
-  if (res.ok) {
-    window.location.href = "/login";
-  } else {
-    document.getElementById("out").textContent = await res.text();
-  }
-});
+  // submit logic
+  document.getElementById("registerForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const form = new FormData(e.target);
+
+    const payload = {
+      FirstName: (form.get("FirstName") || "").trim(),
+      LastName: (form.get("LastName") || "").trim(),
+      email: (form.get("email") || "").trim(),
+      password: (form.get("password") || "").trim(),
+      NIDnumber: (form.get("NIDnumber") || "").trim(),
+
+      hasCar: form.get("hasCar") === "on",
+      drivingLicenseNumber: (form.get("drivingLicenseNumber") || "").trim(),
+      carNumber: (form.get("carNumber") || "").trim()
+    };
+
+    const res = await fetch("/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+      window.location.href = "/login";
+    } else {
+      document.getElementById("out").textContent = await res.text();
+    }
+  });
 </script>
+
 </body>
 </html>

@@ -16,7 +16,7 @@ public class AuthController {
         this.users = users;
     }
 
-    // --- DTOs (minimal) ---
+    // --- DTOs means Data Transfer Objects ---
     // AuthRequest carries data FROM client TO server.
     public static class AuthRequest {
         public String FirstName;
@@ -24,6 +24,10 @@ public class AuthController {
         public String email;
         public String password;
         public String NIDnumber;
+        public Boolean hasCar;
+        public String drivingLicenseNumber;
+        public String carNumber;
+
     }
     // AuthResponse carries data FROM server TO client.
     public static class AuthResponse {
@@ -37,13 +41,16 @@ public class AuthController {
     }
     // requestbody to map json data
    @PostMapping("/register")
-public AuthResponse register(@RequestBody AuthRequest req) {
+    public AuthResponse register(@RequestBody AuthRequest req) {
 
     String email = req.email == null ? "" : req.email.trim().toLowerCase();
     String password = req.password == null ? "" : req.password.trim();
     String firstName = req.FirstName == null ? "" : req.FirstName.trim();
     String lastName = req.LastName == null ? "" : req.LastName.trim();
     String nid = req.NIDnumber == null ? "" : req.NIDnumber.trim();
+    boolean hasCar = req.hasCar != null && req.hasCar;
+    String dl = req.drivingLicenseNumber == null ? "" : req.drivingLicenseNumber.trim();
+    String carNo = req.carNumber == null ? "" : req.carNumber.trim();
 
     if (email.isBlank() || password.isBlank() || firstName.isBlank() || nid.isBlank()) {
         throw new ResponseStatusException(
@@ -61,6 +68,26 @@ public AuthResponse register(@RequestBody AuthRequest req) {
     if (users.findByNIDnumber(nid).isPresent()) {
         throw new ResponseStatusException(HttpStatus.CONFLICT, "NIDnumber already exists");
     }
+    if (hasCar) {
+    if (dl.isBlank()) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "Driving license number is required if user has a car");
+    }
+    if (carNo.isBlank()) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "Car number is required if user has a car");
+    }
+
+    if (users.findByDrivingLicenseNumber(dl).isPresent()) {
+        throw new ResponseStatusException(HttpStatus.CONFLICT,
+                "Driving license number already exists");
+    }
+
+    if (users.findByCarNumber(carNo).isPresent()) {
+        throw new ResponseStatusException(HttpStatus.CONFLICT,
+                "Car number already exists");
+    }
+}
 
     User u = new User();
     u.setEmail(email);
@@ -68,6 +95,10 @@ public AuthResponse register(@RequestBody AuthRequest req) {
     u.setFirstName(firstName);
     u.setLastName(lastName.isBlank() ? null : lastName);
     u.setNIDnumber(nid);
+    u.setHasCar(hasCar);
+    u.setDrivingLicenseNumber(hasCar ? dl : null);
+    u.setCarNumber(hasCar ? carNo : null);
+
 
     try {
         u = users.saveAndFlush(u); // save once + force DB constraints now

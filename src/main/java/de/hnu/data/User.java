@@ -27,6 +27,15 @@ public class User {
   
   @Column(nullable = false)
   private String password;
+  // nullable false means it is mandatory field
+  @Column(nullable = false)
+  private boolean hasCar;
+
+  @Column(unique = true)
+  private String drivingLicenseNumber;
+
+  @Column(unique = true)
+  private String carNumber;
 
   @Column(unique = true, nullable = false)
   private String NIDnumber;
@@ -47,5 +56,19 @@ public class User {
 
   public String getNIDnumber() { return NIDnumber; }
   public void setNIDnumber(String NIDnumber) { this.NIDnumber = NIDnumber; }
+
+  public boolean isHasCar() { return hasCar; }
+  public void setHasCar(boolean hasCar) { this.hasCar = hasCar; }
+
+  public String getDrivingLicenseNumber() { return drivingLicenseNumber; }
+  public void setDrivingLicenseNumber(String drivingLicenseNumber) {
+    this.drivingLicenseNumber = drivingLicenseNumber;
+}
+
+  public String getCarNumber() { return carNumber; }
+  public void setCarNumber(String carNumber) {
+    this.carNumber = carNumber;
+}
+
 
 }
