@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Choose Ride Type</title>
+</head>
+<body>
+  <h2>Choose an option</h2>
+
+  <a th:href="@{/rides/search}">
+    <button>Search for a Shared Ride</button>
+  </a>
+
+  <a th:href="@{/rides/luggage}">
+    <button>Ride with Luggage</button>
+  </a>
+</body>
+</html>
