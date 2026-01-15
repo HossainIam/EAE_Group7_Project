@@ -12,7 +12,6 @@ public class PageController {
     return "redirect:/login";
     }
 
-
     @GetMapping("/login")
     public String loginPage() {
         return "login";
@@ -22,7 +21,7 @@ public class PageController {
     public String login(@RequestParam String username,
                         @RequestParam String password) {
 
-        // validate user here
+        // request param means we get the values from the form with the names "username" and "password"
 
         return "redirect:/home";
     }
@@ -44,17 +43,13 @@ public class PageController {
     // Register Page
     @GetMapping("/register")
     public String registerPage() {
-    return "register";
+         return "register";
 }
 
     @PostMapping("/register")
     public String register(@RequestParam String username,
                        @RequestParam String password) {
 
-    // TODO: save user to DB (recommended)
-    // for now: store in memory or use repository
-
-    return "redirect:/login";
+        return "redirect:/login";
 }
-
 }
