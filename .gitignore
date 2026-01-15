@@ -1,0 +1,34 @@
+# Maven
+target/
+*.log
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# VS Code
+.vscode/
+
+# Dev Container
+.devcontainer/derby/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Java
+*.class
+
+# Docker
+*.tar
+*.tar.gz
+
+# Python cache (since you installed python)
+__pycache__/
+*.pyc
+
+# Node (if ever used)
+node_modules/
+

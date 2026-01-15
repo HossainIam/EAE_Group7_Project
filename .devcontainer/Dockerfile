@@ -5,6 +5,8 @@ RUN pip install numpy
 RUN pip install pandas
 RUN pip install torch
 RUN pip install jep
+RUN apt-get update && apt-get install -y git      # We will remove it before submission
+
 
 COPY apache-maven-3.9.9-bin.tar.gz /usr/local
 RUN tar xvf /usr/local/apache-maven-3.9.9-bin.tar.gz -C /usr/local
