@@ -5,8 +5,12 @@
 <h2>Register</h2>
 
 <form id="registerForm">
+  <input name="FirstName" placeholder="First Name" /><br/><br/>
+  <input name="LastName" placeholder="Last Name" /><br/><br/>
   <input name="email" placeholder="Email" /><br/><br/>
   <input name="password" type="password" placeholder="Password" /><br/><br/>
+  <input name="NIDnumber" placeholder="National ID Number" /><br/><br/>
+
   <button type="submit">Create account</button>
   <a href="/login">Back to login</a>
 </form>
@@ -17,7 +21,14 @@
 document.getElementById("registerForm").addEventListener("submit", async e => {
   e.preventDefault();
   const form = new FormData(e.target);
-  const data = { email: form.get("email"), password: form.get("password") };
+
+  const data = {
+    FirstName: (form.get("FirstName") || "").trim(),
+    LastName: (form.get("LastName") || "").trim(),
+    email: (form.get("email") || "").trim(),
+    password: (form.get("password") || "").trim(),
+    NIDnumber: (form.get("NIDnumber") || "").trim()
+  };
 
   const res = await fetch("/auth/register", {
     method: "POST",

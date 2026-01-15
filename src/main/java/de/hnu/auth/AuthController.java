@@ -17,11 +17,15 @@ public class AuthController {
     }
 
     // --- DTOs (minimal) ---
+    // AuthRequest carries data FROM client TO server.
     public static class AuthRequest {
+        public String FirstName;
+        public String LastName;
         public String email;
         public String password;
+        public String NIDnumber;
     }
-
+    // AuthResponse carries data FROM server TO client.
     public static class AuthResponse {
         public Long userId;
         public String email;
@@ -31,23 +35,52 @@ public class AuthController {
             this.email = email;
         }
     }
+    // requestbody to map json data
+   @PostMapping("/register")
+public AuthResponse register(@RequestBody AuthRequest req) {
 
-    @PostMapping("/register")
-    public AuthResponse register(@RequestBody AuthRequest req) {
-        if (req.email == null || req.email.isBlank() || req.password == null || req.password.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "email and password required");
-        }
-        if (users.findByEmail(req.email).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "email already exists");
-        }
+    String email = req.email == null ? "" : req.email.trim().toLowerCase();
+    String password = req.password == null ? "" : req.password.trim();
+    String firstName = req.FirstName == null ? "" : req.FirstName.trim();
+    String lastName = req.LastName == null ? "" : req.LastName.trim();
+    String nid = req.NIDnumber == null ? "" : req.NIDnumber.trim();
 
-        User u = new User(); // NOW it is stored in Derby (INSERT)
-        u.setEmail(req.email.trim().toLowerCase());
-        u.setPassword(req.password); // NOTE: plain text for now (we’ll hash later)
-        u = users.save(u);
-
-        return new AuthResponse(u.getId(), u.getEmail());
+    if (email.isBlank() || password.isBlank() || firstName.isBlank() || nid.isBlank()) {
+        throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "FirstName, NIDnumber, email, password are required"
+        );
     }
+
+    // Check email uniqueness
+    if (users.findByEmail(email).isPresent()) {
+        throw new ResponseStatusException(HttpStatus.CONFLICT, "email already exists");
+    }
+
+    // Check NID uniqueness (BEFORE saving)
+    if (users.findByNIDnumber(nid).isPresent()) {
+        throw new ResponseStatusException(HttpStatus.CONFLICT, "NIDnumber already exists");
+    }
+
+    User u = new User();
+    u.setEmail(email);
+    u.setPassword(password); // later hash
+    u.setFirstName(firstName);
+    u.setLastName(lastName.isBlank() ? null : lastName);
+    u.setNIDnumber(nid);
+
+    try {
+        u = users.saveAndFlush(u); // save once + force DB constraints now
+    } catch (Exception ex) {
+        throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "email or NIDnumber already exists"
+        );
+    }
+
+    return new AuthResponse(u.getId(), u.getEmail());
+}
+
 
     @PostMapping("/login")
     public AuthResponse login(@RequestBody AuthRequest req) {
