@@ -14,7 +14,6 @@
 </form>
 
 <pre id="out"></pre>
-
 <script>
 document.getElementById("loginForm").addEventListener("submit", async e => {
   e.preventDefault();
@@ -32,12 +31,16 @@ document.getElementById("loginForm").addEventListener("submit", async e => {
   });
 
   if (res.ok) {
+    const body = await res.json();                // read JSON: { userId, email }
+    localStorage.setItem("userId", body.userId);  // store userId
+    localStorage.setItem("email", body.email);    // optional
     window.location.href = "/home";
   } else {
     document.getElementById("out").textContent = await res.text();
   }
 });
 </script>
+
 
 </body>
 </html>

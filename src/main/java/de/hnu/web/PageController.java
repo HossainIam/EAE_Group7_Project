@@ -40,6 +40,12 @@ public class PageController {
     public String luggageRidePage() {
         return "luggage-ride";
     }
+
+    @GetMapping("/rides/offer")  // Offer Ride Page
+    public String offerRidePage() {
+    return "offer-ride";
+}
+
     // Register Page
     @GetMapping("/register")
     public String registerPage() {

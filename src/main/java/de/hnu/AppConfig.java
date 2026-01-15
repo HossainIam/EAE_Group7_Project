@@ -45,7 +45,7 @@ public class AppConfig {
   
     LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
     factory.setJpaVendorAdapter(vendorAdapter);
-    factory.setPackagesToScan("de.hnu.data");
+    factory.setPackagesToScan("de.hnu.data", "de.hnu.rides");
     factory.setDataSource(dataSource());
     return factory;
   }

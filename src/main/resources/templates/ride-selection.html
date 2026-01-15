@@ -1,17 +1,53 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>Choose Ride Type</title>
+  <title>Home</title>
 </head>
 <body>
-  <h2>Choose an option</h2>
 
-  <a th:href="@{/rides/search}">
-    <button>Search for a Shared Ride</button>
-  </a>
+<h2>Home</h2>
 
-  <a th:href="@{/rides/luggage}">
-    <button>Ride with Luggage</button>
-  </a>
+<button onclick="window.location.href='/rides/search'">
+  Search for a ride
+</button>
+<br/><br/>
+
+<button onclick="window.location.href='/rides/luggage'">
+  Ride with luggage
+</button>
+<br/><br/>
+
+<!-- ✅ 3rd option (hidden until hasCar=true) -->
+<button id="offerRideBtn" style="display:none;" onclick="window.location.href='/rides/offer'">
+  Offer a ride
+</button>
+
+<pre id="out"></pre>
+
+<script>
+(async () => {
+  const out = document.getElementById("out");
+  const userId = localStorage.getItem("userId");
+
+  if (!userId) {
+    out.textContent = "No userId found. Please login again.";
+    window.location.href = "/login";
+    return;
+  }
+
+  const res = await fetch("/users/" + userId);
+  out.textContent = "GET /users/" + userId + " -> " + res.status;
+
+  if (!res.ok) return;
+
+  const user = await res.json();
+  out.textContent += "\nemail=" + user.email + " hasCar=" + user.hasCar;
+
+  if (user.hasCar === true) {
+    document.getElementById("offerRideBtn").style.display = "inline-block";
+  }
+})();
+</script>
+
 </body>
 </html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Offer a Ride</title>
+</head>
+<body>
+
+<h2>Offer a Ride</h2>
+
+<form id="offerRideForm">
+  <input name="fromLocation" placeholder="From" required><br/><br/>
+  <input name="toLocation" placeholder="To" required><br/><br/>
+
+  <label>Departure Time</label><br/>
+  <input type="datetime-local" name="departureTime" required><br/><br/>
+
+  <label>Available Seats</label><br/>
+  <input type="number" name="availableSeats" min="1" required><br/><br/>
+
+  <label>Total Fuel Cost (€)</label><br/>
+  <input type="number" name="totalFuelCost" step="0.01" min="0" required><br/><br/>
+
+  <button type="submit">Post Ride</button>
+  <a href="/home">Back</a>
+</form>
+
+<pre id="out"></pre>
+
+<script>
+document.getElementById("offerRideForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const form = new FormData(e.target);
+
+  const userId = localStorage.getItem("userId");
+  if (!userId) {
+    document.getElementById("out").textContent = "Please login again.";
+    window.location.href = "/login";
+    return;
+  }
+
+  const payload = {
+    driverId: Number(userId),
+    fromLocation: (form.get("fromLocation") || "").trim(),
+    toLocation: (form.get("toLocation") || "").trim(),
+    departureTime: form.get("departureTime"), // "YYYY-MM-DDTHH:mm"
+    availableSeats: Number(form.get("availableSeats")),
+    totalFuelCost: Number(form.get("totalFuelCost"))
+  };
+
+  const res = await fetch("/rides", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+
+  document.getElementById("out").textContent = res.ok
+    ? ("Ride posted! " + JSON.stringify(await res.json(), null, 2))
+    : await res.text();
+});
+</script>
+
+</body>
+</html>
