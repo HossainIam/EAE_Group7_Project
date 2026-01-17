@@ -2,17 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <title>Offer a Ride</title>
-  <!-- Google Api key for the body-->
-  <!--<script
-    src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initMap"
-    async
-    defer
-  ></script> -->
-<link
-  rel="stylesheet"
-  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 </head>
 
 <body>
@@ -20,8 +11,8 @@
 <h2>Offer a Ride</h2>
 
 <form id="offerRideForm">
- <input id="fromLocation" name="fromLocation" placeholder="From" required>
-<input id="toLocation" name="toLocation" placeholder="To" required>
+  <input id="fromLocation" name="fromLocation" placeholder="From" required><br/><br/>
+  <input id="toLocation" name="toLocation" placeholder="To" required><br/><br/>
 
   <label>Departure Time</label><br/>
   <input type="datetime-local" name="departureTime" required><br/><br/>
@@ -29,28 +20,33 @@
   <label>Available Seats</label><br/>
   <input type="number" name="availableSeats" min="1" required><br/><br/>
 
-
   <label>Fuel consumption (L/100km)</label><br/>
   <input type="number" id="consumption" step="0.1" min="0" value="7"><br/><br/>
 
   <label>Fuel price (€/L)</label><br/>
   <input type="number" id="fuelPrice" step="0.01" min="0" value="1.80"><br/><br/>
 
-
   <label>Total Fuel Cost (€)</label><br/>
   <input type="number" id="totalFuelCost" name="totalFuelCost" step="0.01" min="0" required><br/><br/>
+
+  <div id="routeInfo" style="margin-top: 8px;"></div>
+
+  <div id="costBreakdown" style="margin-top:8px; font-weight:600;"></div>
+  <p style="margin-top:6px; font-size:14px;">
+    Note: A €1 platform maintenance fee is charged when posting a ride.
+  </p>
 
   <button type="submit">Post Ride</button>
   <a href="/home">Back</a>
 </form>
 
-  <!-- Api for map and route info -->
+<!-- Map + route info (ONLY ONCE) -->
 <div id="map" style="height: 360px; width: 100%; margin-top: 16px;"></div>
-<div id="routeInfo" style="margin-top: 8px;"></div>
-
-
 
 <pre id="out"></pre>
+
+<!-- Leaflet JS (load after DOM) -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
 document.getElementById("offerRideForm").addEventListener("submit", async (e) => {
@@ -68,7 +64,7 @@ document.getElementById("offerRideForm").addEventListener("submit", async (e) =>
     driverId: Number(userId),
     fromLocation: (form.get("fromLocation") || "").trim(),
     toLocation: (form.get("toLocation") || "").trim(),
-    departureTime: form.get("departureTime"), // "YYYY-MM-DDTHH:mm"
+    departureTime: form.get("departureTime"),
     availableSeats: Number(form.get("availableSeats")),
     totalFuelCost: Number(form.get("totalFuelCost"))
   };
@@ -84,6 +80,7 @@ document.getElementById("offerRideForm").addEventListener("submit", async (e) =>
     : await res.text();
 });
 </script>
+
 <script>
 const map = L.map("map").setView([48.137, 11.575], 6);
 
@@ -92,6 +89,19 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 }).addTo(map);
 
 let routeLine = null;
+
+function updateCostBreakdown(totalFuelCost) {
+  const seats = Number(document.querySelector('input[name="availableSeats"]').value || 0);
+  const participants = 1 + seats; // driver + all available seats (estimate)
+  const platformFee = 1;
+
+  const fuelPerPerson = totalFuelCost / participants;
+  const totalPerPerson = fuelPerPerson + platformFee;
+
+  document.getElementById("costBreakdown").textContent =
+    `Total per person (${participants} people): €${totalPerPerson.toFixed(2)} ` +
+    `(Fuel: €${fuelPerPerson.toFixed(2)} + Platform fee: €1.00)`;
+}
 
 async function tryRoute() {
   const from = document.getElementById("fromLocation").value.trim();
@@ -103,7 +113,6 @@ async function tryRoute() {
 
   const fromData = await fromRes.json();
   const toData = await toRes.json();
-
   if (!fromData.length || !toData.length) return;
 
   const fromLat = fromData[0].lat;
@@ -120,17 +129,20 @@ async function tryRoute() {
   const distanceKm = routeData.routes[0].distance / 1000;
 
   if (routeLine) map.removeLayer(routeLine);
-  routeLine = L.polyline(coords, { color: "blue" }).addTo(map);
+  routeLine = L.polyline(coords).addTo(map);
   map.fitBounds(routeLine.getBounds());
 
   const consumption = Number(document.getElementById("consumption").value || 0);
   const fuelPrice = Number(document.getElementById("fuelPrice").value || 0);
-  const cost = (distanceKm / 100) * consumption * fuelPrice;
+  const totalFuelCost = (distanceKm / 100) * consumption * fuelPrice;
 
   document.getElementById("routeInfo").textContent =
-    `Distance: ${distanceKm.toFixed(1)} km | Estimated fuel cost: €${cost.toFixed(2)}`;
+    `Distance: ${distanceKm.toFixed(1)} km | Total fuel cost: €${totalFuelCost.toFixed(2)}`;
 
-  document.getElementById("totalFuelCost").value = cost.toFixed(2);
+  document.getElementById("totalFuelCost").value = totalFuelCost.toFixed(2);
+
+  // NEW: show total per person
+  updateCostBreakdown(totalFuelCost);
 }
 
 // auto update
@@ -138,6 +150,10 @@ document.getElementById("fromLocation").addEventListener("blur", tryRoute);
 document.getElementById("toLocation").addEventListener("blur", tryRoute);
 document.getElementById("consumption").addEventListener("input", tryRoute);
 document.getElementById("fuelPrice").addEventListener("input", tryRoute);
+document.querySelector('input[name="availableSeats"]').addEventListener("input", () => {
+  const totalFuelCost = Number(document.getElementById("totalFuelCost").value || 0);
+  if (totalFuelCost > 0) updateCostBreakdown(totalFuelCost);
+});
 </script>
 
 </body>
