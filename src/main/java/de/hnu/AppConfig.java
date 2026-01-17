@@ -53,8 +53,7 @@ public class AppConfig {
     return factory;
   }
 
-  @Bean // Okay, I found the transaction manager.
-  Now I can control transactions automatically.
+  @Bean // Okay, I found the transaction manager. Now I can control transactions automatically.
   public PlatformTransactionManager transactionManager(LocalContainerEntityManagerFactoryBean entityManagerFactory) {
     JpaTransactionManager txManager = new JpaTransactionManager();
     txManager.setEntityManagerFactory(entityManagerFactory.getObject());

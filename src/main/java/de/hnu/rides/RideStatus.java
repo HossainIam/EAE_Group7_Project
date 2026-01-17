@@ -1,7 +1,7 @@
 package de.hnu.rides;
 
 public enum RideStatus {
-    START,
+    OPEN,
     FULL,
     CANCELLED,
     COMPLETED

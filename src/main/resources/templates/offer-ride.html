@@ -2,14 +2,26 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <title>Offer a Ride</title>
+  <!-- Google Api key for the body-->
+  <!--<script
+    src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initMap"
+    async
+    defer
+  ></script> -->
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
+
 <body>
 
 <h2>Offer a Ride</h2>
 
 <form id="offerRideForm">
-  <input name="fromLocation" placeholder="From" required><br/><br/>
-  <input name="toLocation" placeholder="To" required><br/><br/>
+ <input id="fromLocation" name="fromLocation" placeholder="From" required>
+<input id="toLocation" name="toLocation" placeholder="To" required>
 
   <label>Departure Time</label><br/>
   <input type="datetime-local" name="departureTime" required><br/><br/>
@@ -17,12 +29,26 @@
   <label>Available Seats</label><br/>
   <input type="number" name="availableSeats" min="1" required><br/><br/>
 
+
+  <label>Fuel consumption (L/100km)</label><br/>
+  <input type="number" id="consumption" step="0.1" min="0" value="7"><br/><br/>
+
+  <label>Fuel price (€/L)</label><br/>
+  <input type="number" id="fuelPrice" step="0.01" min="0" value="1.80"><br/><br/>
+
+
   <label>Total Fuel Cost (€)</label><br/>
-  <input type="number" name="totalFuelCost" step="0.01" min="0" required><br/><br/>
+  <input type="number" id="totalFuelCost" name="totalFuelCost" step="0.01" min="0" required><br/><br/>
 
   <button type="submit">Post Ride</button>
   <a href="/home">Back</a>
 </form>
+
+  <!-- Api for map and route info -->
+<div id="map" style="height: 360px; width: 100%; margin-top: 16px;"></div>
+<div id="routeInfo" style="margin-top: 8px;"></div>
+
+
 
 <pre id="out"></pre>
 
@@ -57,6 +83,61 @@ document.getElementById("offerRideForm").addEventListener("submit", async (e) =>
     ? ("Ride posted! " + JSON.stringify(await res.json(), null, 2))
     : await res.text();
 });
+</script>
+<script>
+const map = L.map("map").setView([48.137, 11.575], 6);
+
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  maxZoom: 19
+}).addTo(map);
+
+let routeLine = null;
+
+async function tryRoute() {
+  const from = document.getElementById("fromLocation").value.trim();
+  const to = document.getElementById("toLocation").value.trim();
+  if (!from || !to) return;
+
+  const fromRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(from)}`);
+  const toRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(to)}`);
+
+  const fromData = await fromRes.json();
+  const toData = await toRes.json();
+
+  if (!fromData.length || !toData.length) return;
+
+  const fromLat = fromData[0].lat;
+  const fromLng = fromData[0].lon;
+  const toLat = toData[0].lat;
+  const toLng = toData[0].lon;
+
+  const routeRes = await fetch(
+    `https://router.project-osrm.org/route/v1/driving/${fromLng},${fromLat};${toLng},${toLat}?overview=full&geometries=geojson`
+  );
+
+  const routeData = await routeRes.json();
+  const coords = routeData.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+  const distanceKm = routeData.routes[0].distance / 1000;
+
+  if (routeLine) map.removeLayer(routeLine);
+  routeLine = L.polyline(coords, { color: "blue" }).addTo(map);
+  map.fitBounds(routeLine.getBounds());
+
+  const consumption = Number(document.getElementById("consumption").value || 0);
+  const fuelPrice = Number(document.getElementById("fuelPrice").value || 0);
+  const cost = (distanceKm / 100) * consumption * fuelPrice;
+
+  document.getElementById("routeInfo").textContent =
+    `Distance: ${distanceKm.toFixed(1)} km | Estimated fuel cost: €${cost.toFixed(2)}`;
+
+  document.getElementById("totalFuelCost").value = cost.toFixed(2);
+}
+
+// auto update
+document.getElementById("fromLocation").addEventListener("blur", tryRoute);
+document.getElementById("toLocation").addEventListener("blur", tryRoute);
+document.getElementById("consumption").addEventListener("input", tryRoute);
+document.getElementById("fuelPrice").addEventListener("input", tryRoute);
 </script>
 
 </body>

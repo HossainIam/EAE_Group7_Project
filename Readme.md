@@ -20,3 +20,18 @@ For updating data.
 For deleting data.
 🔹 8. @RequestMapping
 Base path for controller.
+
+# Frontend sends	Spring uses
+form-data	@RequestParam
+JSON	@RequestBody
+@RequestParam and @RequestBody do only one main job:
+They read data that is already sent by the client.
+They do not create data.
+They do not convert JavaScript to JSON.
+They only read what the client provided.
+
+👉 @RequestParam and @RequestBody do only one main job:
+They read data that is already sent by the client.
+They do not create data.
+They do not convert JavaScript to JSON.
+They only read what the client provided.
