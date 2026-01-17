@@ -6,6 +6,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+
+// @RequestBody this is telling spring to map json that data sended from client to this object 
+
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -40,6 +44,7 @@ public class AuthController {
         }
     }
     // requestbody to map json data
+    // postmapping normal work is sending data to server 
    @PostMapping("/register")
     public AuthResponse register(@RequestBody AuthRequest req) {
 
@@ -88,7 +93,7 @@ public class AuthController {
                 "Car number already exists");
     }
 }
-
+    // creating user and setting fields 
     User u = new User();
     u.setEmail(email);
     u.setPassword(password); // later hash
@@ -99,9 +104,9 @@ public class AuthController {
     u.setDrivingLicenseNumber(hasCar ? dl : null);
     u.setCarNumber(hasCar ? carNo : null);
 
-
+    // Saving user and handling potential conflicts
     try {
-        u = users.saveAndFlush(u); // save once + force DB constraints now
+        u = users.saveAndFlush(u); 
     } catch (Exception ex) {
         throw new ResponseStatusException(
                 HttpStatus.CONFLICT,

@@ -10,7 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity 
-@Table(name = "users")
+@Table(name = "users") // Rename the table to "users"
 public class User {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -62,8 +62,7 @@ public class User {
 
   public String getDrivingLicenseNumber() { return drivingLicenseNumber; }
   public void setDrivingLicenseNumber(String drivingLicenseNumber) {
-    this.drivingLicenseNumber = drivingLicenseNumber;
-}
+    this.drivingLicenseNumber = drivingLicenseNumber;}
 
   public String getCarNumber() { return carNumber; }
   public void setCarNumber(String carNumber) {

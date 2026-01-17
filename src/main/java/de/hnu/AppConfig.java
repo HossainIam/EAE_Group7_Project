@@ -18,11 +18,14 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.zaxxer.hikari.HikariDataSource;
 
-@Configuration
-@EnableJpaRepositories
-@EnableTransactionManagement
-public class AppConfig {
+// The class AppConfig is the configuration.
+// The objects created inside it are called Beans.
 
+@Configuration // Spring configuration.
+@EnableJpaRepositories // Enable all UserRepository, RideRepository, etc.
+@EnableTransactionManagement // Enable all UserRepository, RideRepository, etc. Please manage database transactions for me automatically.
+public class AppConfig {
+  // A bean is an object that is managed by Spring .
   @Bean
   @ConfigurationProperties("app.datasource")
   public DataSourceProperties dataSourceProperties() {
@@ -50,7 +53,8 @@ public class AppConfig {
     return factory;
   }
 
-  @Bean
+  @Bean // Okay, I found the transaction manager.
+  Now I can control transactions automatically.
   public PlatformTransactionManager transactionManager(LocalContainerEntityManagerFactoryBean entityManagerFactory) {
     JpaTransactionManager txManager = new JpaTransactionManager();
     txManager.setEntityManagerFactory(entityManagerFactory.getObject());

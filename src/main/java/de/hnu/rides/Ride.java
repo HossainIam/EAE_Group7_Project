@@ -13,7 +13,7 @@ public class Ride {
     private Long id;
 
     @ManyToOne
-    private User driver;
+    private User driver;                               // The user who offers the ride and speciphy as a foreign key relationship to the User entity.
 
     private String fromLocation;
     private String toLocation;
@@ -24,7 +24,7 @@ public class Ride {
 
     private double totalFuelCost;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING) // An enum is a fixed list of values. An enum is a fixed list of values.
     private RideStatus status;
 
     // getters & setters

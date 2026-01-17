@@ -6,11 +6,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-@RestController
-@RequestMapping("/users")
+@RestController           // This class handles REST API requests and returns data in JSON format
+@RequestMapping("/users") // Base path for controller.
+//Repository injection
 public class UserController {
 
-    private final UserRepository users;
+    private final UserRepository users; // allow user to interact with user data in the database
 
     public UserController(UserRepository users) {
         this.users = users;
@@ -28,9 +29,9 @@ public class UserController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}") // @pathvariable to get user by id, is used to extract a value from the URL and use it inside your method.
     public UserInfoResponse getUser(@PathVariable Long id) {
-        User u = users.findById(id)
+        User u = users.findById(id) // retrive existing user from database
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found"));
 
         return new UserInfoResponse(u.getId(), u.getEmail(), u.isHasCar());
