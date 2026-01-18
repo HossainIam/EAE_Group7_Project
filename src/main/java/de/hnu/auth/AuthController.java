@@ -44,7 +44,8 @@ public class AuthController {
         }
     }
     // requestbody to map json data
-    // postmapping normal work is sending data to server 
+    // req is an object created by Spring using Jackson after reading JSON from the request body.
+    // The name 'req' is chosen by me. @RequestBody tells Spring to map JSON into this object.
    @PostMapping("/register")
     public AuthResponse register(@RequestBody AuthRequest req) {
 
