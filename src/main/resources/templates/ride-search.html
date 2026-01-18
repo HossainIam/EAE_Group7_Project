@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Search Rides</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+
+  <body>
+    <div class="app">
+      <h2>Search for a ride</h2>
+
+      <form id="searchForm">
+        <input id="from" placeholder="From" required />
+        <input id="to" placeholder="To" required />
+
+        <div class="button-group">
+          <button type="submit">Search</button>
+
+          <button
+            type="button"
+            onclick="window.location.href='/rides/request'"
+          >
+            Request a ride
+          </button>
+        </div>
+
+        <div class="info" style="margin-top: 10px;">
+          <a href="/home">Back</a>
+        </div>
+      </form>
+
+      <hr />
+
+      <div id="list"></div>
+      <pre id="out"></pre>
+    </div>
+
+    <script>
+      document
+        .getElementById("searchForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const from = document.getElementById("from").value.trim().toLowerCase();
+          const to = document.getElementById("to").value.trim().toLowerCase();
+
+          const res = await fetch("/rides");
+          if (!res.ok) {
+            document.getElementById("out").textContent = await res.text();
+            return;
+          }
+
+          const rides = await res.json();
+
+          // only OPEN rides + basic matching
+          const matches = rides.filter(
+            (r) =>
+              r.status === "OPEN" &&
+              String(r.fromLocation || "").toLowerCase().includes(from) &&
+              String(r.toLocation || "").toLowerCase().includes(to)
+          );
+
+          const box = document.getElementById("list");
+
+          if (matches.length === 0) {
+            box.innerHTML = "<p><b>No rides found.</b></p>";
+            return;
+          }
+
+          box.innerHTML = matches
+            .map(
+              (r) => `
+                <div class="card">
+                  <div><b>${r.fromLocation}</b> → <b>${r.toLocation}</b></div>
+                  <div class="info" style="margin-top: 6px;">Departure: ${r.departureTime}</div>
+                  <div class="info">
+                    Seats: ${r.availableSeats} | Fuel cost: €${Number(
+                      r.totalFuelCost
+                    ).toFixed(2)}
+                  </div>
+                  <div style="margin-top: 10px;">
+                    <button onclick="selectRide(${r.id})">Choose</button>
+                  </div>
+                </div>
+              `
+            )
+            .join("");
+        });
+
+      function selectRide(id) {
+        localStorage.setItem("selectedRideId", id);
+        alert("Selected ride: " + id);
+        // next step: open ride details / join ride page
+      }
+    </script>
+  </body>
+</html>

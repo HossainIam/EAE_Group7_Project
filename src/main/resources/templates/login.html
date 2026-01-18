@@ -1,46 +1,55 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
+  <head>
     <title>Login</title>
-</head>
-<body>
-<h2>Login</h2>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
 
-<form id="loginForm">
-    <input name="email" placeholder="Email"/><br/><br/>
-    <input name="password" type="password" placeholder="Password"/><br/><br/>
-    <button type="submit">Login</button>
-    <a href="/register">Create an account</a>
-</form>
+  <body>
+    <div class="app">
+      <h2>Login</h2>
 
-<pre id="out"></pre>
-<script>
-document.getElementById("loginForm").addEventListener("submit", async e => {
-  e.preventDefault();
+      <form id="loginForm">
+        <input name="email" placeholder="Email" />
+        <input name="password" type="password" placeholder="Password" />
 
-  const form = new FormData(e.target);
-  const data = {
-    email: form.get("email"),
-    password: form.get("password")
-  };
+        <button type="submit">Login</button>
 
-  const res = await fetch("/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  });
+        <div class="info" style="margin-top: 10px;">
+          <a href="/register">Create an account</a>
+        </div>
+      </form>
 
-  if (res.ok) {
-    const body = await res.json();                // read JSON: { userId, email }
-    localStorage.setItem("userId", body.userId);  // store userId
-    localStorage.setItem("email", body.email);    // optional
-    window.location.href = "/home";
-  } else {
-    document.getElementById("out").textContent = await res.text();
-  }
-});
-</script>
+      <pre id="out"></pre>
+    </div>
 
+    <script>
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
 
-</body>
+          const form = new FormData(e.target);
+          const data = {
+            email: form.get("email"),
+            password: form.get("password"),
+          };
+
+          const res = await fetch("/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          });
+
+          if (res.ok) {
+            const body = await res.json(); // read JSON: { userId, email }
+            localStorage.setItem("userId", body.userId); // store userId
+            localStorage.setItem("email", body.email); // optional
+            window.location.href = "/home";
+          } else {
+            document.getElementById("out").textContent = await res.text();
+          }
+        });
+    </script>
+  </body>
 </html>

@@ -1,0 +1,305 @@
+/* =========================================================
+   RIDE SHARE MOBILE APP — GREEN THEME (ORGANIZED CSS)
+   Notes:
+   - Same visual behavior as your current CSS
+   - Adds theme variables (easy to maintain)
+   - Keeps your class names unchanged
+   ========================================================= */
+
+
+/* =========================
+   1) THEME VARIABLES
+   ========================= */
+:root {
+  /* Brand Greens */
+  --green-900: #1b5e20;
+  --green-800: #166534;
+  --green-700: #2e7d32;  /* main brand */
+  --green-600: #43a047;  /* accent */
+
+  /* Backgrounds / Surfaces */
+  --bg: #ecf5f0;
+  --surface: #ffffff;
+  --surface-soft: #e8f5e9;
+
+  /* Text */
+  --text: #111;
+  --text-muted: #555;
+
+  /* Borders / Shadows */
+  --border: #b2dfdb;
+  --shadow-sm: 0 3px 10px rgba(0,0,0,0.08);
+  --shadow-md: 0 10px 25px rgba(0,0,0,0.15);
+
+  /* Radius / Spacing */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
+
+  /* Danger */
+  --danger-700: #b71c1c;
+  --danger-600: #c62828;
+  --danger-500: #e53935;
+}
+
+
+/* =========================
+   2) GLOBAL / LAYOUT
+   ========================= */
+body {
+  font-family: Arial, sans-serif;
+  background-color: var(--bg);
+  margin: 0;
+  padding: 10px;
+
+  /* center app like mobile */
+  display: flex;
+  justify-content: center;
+}
+
+.app {
+  max-width: 420px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 12px;
+  background: transparent;
+}
+
+
+/* =========================
+   3) TOP BAR (NO WHITE CARD)
+   ========================= */
+.topbar {
+  background: transparent;
+  border-radius: 0;
+  padding: 12px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: none;
+  margin-bottom: 12px;
+}
+
+.brand {
+  font-weight: bold;
+  font-size: 22px;
+  color: var(--green-700);
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  font-size: 26px;
+  cursor: pointer;
+  color: var(--green-700);
+  padding: 6px;
+  line-height: 1;
+}
+
+
+/* =========================
+   4) MENU / DROPDOWN
+   ========================= */
+.menu {
+  position: relative;
+}
+
+/* dropdown aligned to right */
+.dropdown {
+  display: none;
+  position: absolute;
+  top: 42px;
+  right: 0;
+  left: auto;
+
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  min-width: 200px;
+  box-shadow: var(--shadow-md);
+  z-index: 100;
+  padding: 10px;
+}
+
+.dropdown.show {
+  display: block;
+}
+
+/* username row (not clickable) */
+.dropdown .username {
+  padding: 10px;
+  font-weight: 700;
+  color: var(--green-700);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  margin-bottom: 6px;
+}
+
+/* keep link/button style */
+.dropdown a,
+.dropdown button {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 10px;
+  text-align: left;
+  cursor: pointer;
+
+  border-radius: 10px;
+  font-size: 14px;
+  color: var(--green-700);
+}
+
+.dropdown a:hover,
+.dropdown button:hover {
+  background-color: var(--surface-soft);
+}
+
+/* logout should look like danger text */
+.dropdown .logout-btn {
+  background: none;
+  color: var(--danger-600);
+  font-weight: 700;
+  padding: 10px;
+}
+
+.dropdown .logout-btn:hover {
+  background: rgba(229, 57, 53, 0.08);
+}
+
+
+/* =========================
+   5) TYPOGRAPHY
+   ========================= */
+h2 {
+  color: var(--green-700);
+  margin-bottom: 14px;
+}
+
+.info {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.error {
+  color: var(--danger-600);
+  font-weight: bold;
+}
+
+
+/* =========================
+   6) FORMS / INPUTS
+   ========================= */
+form {
+  background: var(--surface);
+  padding: 18px;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  box-sizing: border-box;
+
+  font-size: 14px;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--green-700);
+}
+
+
+/* =========================
+   7) BUTTONS
+   ========================= */
+button {
+  width: 100%;
+  background: linear-gradient(135deg, var(--green-700), var(--green-600));
+  color: var(--surface);
+  border: none;
+  padding: 14px;
+  border-radius: var(--radius-lg);
+  font-size: 16px;
+  cursor: pointer;
+  text-align: center;
+  font-weight: 600;
+}
+
+button:hover {
+  background: linear-gradient(135deg, var(--green-900), var(--green-700));
+}
+
+/* button groups */
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* logout special (used outside dropdown if needed) */
+.logout-btn {
+  background: linear-gradient(135deg, var(--danger-600), var(--danger-500));
+}
+
+.logout-btn:hover {
+  background: linear-gradient(135deg, var(--danger-700), var(--danger-600));
+}
+
+/* HOME MENU BUTTONS */
+.home-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.home-menu button {
+  font-size: 17px;
+  padding: 16px;
+}
+
+
+/* =========================
+   8) CARDS / LIST ITEMS
+   ========================= */
+.card {
+  background: var(--surface);
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  margin-bottom: 14px;
+  border-left: 5px solid var(--green-600);
+}
+
+
+/* =========================
+   9) MAP
+   ========================= */
+#map {
+  border-radius: var(--radius-lg);
+  margin-top: 14px;
+}
+
+
+/* =========================
+   10) LINKS
+   ========================= */
+a {
+  color: var(--green-700);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+
+/* =========================
+   11) FOOTER SPACE
+   ========================= */
+.footer-space {
+  height: 30px;
+}

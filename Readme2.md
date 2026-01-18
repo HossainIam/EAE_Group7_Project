@@ -97,3 +97,6 @@ If you want, I can also prepare markdown notes for:
 Controller vs Service vs Repository  
 Entity vs DTO  
 Full login flow diagram
+
+# To run it on another page 
+mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=8081

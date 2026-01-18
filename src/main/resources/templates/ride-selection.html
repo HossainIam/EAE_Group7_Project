@@ -1,53 +1,116 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-  <title>Home</title>
-</head>
-<body>
+  <head>
+    <title>Home</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
 
-<h2>Home</h2>
+  <body>
+    <div class="app">
+      <div class="topbar">
+        <!-- No title in topbar -->
+        <div class="brand"></div>
 
-<button onclick="window.location.href='/rides/search'">
-  Search for a ride
-</button>
-<br/><br/>
+        <div class="menu">
+          <button class="icon-btn" id="menuBtn" type="button">☰</button>
 
-<button onclick="window.location.href='/rides/luggage'">
-  Ride with luggage
-</button>
-<br/><br/>
+          <div class="dropdown" id="menuDropdown">
+            <!-- username (not clickable) -->
+            <div class="username" id="userNameText">User</div>
 
-<!-- hidden until hasCar=true -->
-<button id="offerRideBtn" style="display:none;" onclick="window.location.href='/rides/offer'">
-  Offer a ride
-</button>
+            <!-- logout only -->
+            <button
+              type="button"
+              class="logout-btn"
+              onclick="localStorage.clear(); window.location.href='/login';"
+              style="width: 100%;"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
 
-<pre id="out"></pre>
+      <!-- Removed duplicate heading -->
+      <!-- <h2>Home</h2> -->
 
-<script>
-(async () => {
-  const out = document.getElementById("out");
-  const userId = localStorage.getItem("userId");
+      <div class="home-menu">
+        <button type="button" onclick="window.location.href='/rides/search'">
+          Search for a ride
+        </button>
 
-  if (!userId) {
-    out.textContent = "No userId found. Please login again.";
-    window.location.href = "/login";
-    return;
-  }
+        <button type="button" onclick="window.location.href='/rides/luggage'">
+          Ride with luggage
+        </button>
 
-  const res = await fetch("/users/" + userId);
-  out.textContent = "GET /users/" + userId + " -> " + res.status;
+        <!-- hidden until hasCar=true -->
+        <button
+          id="offerRideBtn"
+          style="display: none;"
+          type="button"
+          onclick="window.location.href='/rides/offer'"
+        >
+          Offer a ride
+        </button>
 
-  if (!res.ok) return;
+        <!-- hidden until hasCar=true -->
+        <button
+          id="viewRequestsBtn"
+          style="display: none;"
+          type="button"
+          onclick="window.location.href='/rides/requests'"
+        >
+          View Ride Requests
+        </button>
+      </div>
 
-  const user = await res.json();
-  out.textContent += "\nemail=" + user.email + " hasCar=" + user.hasCar;
+      <pre id="out"></pre>
+    </div>
 
-  if (user.hasCar === true) {
-    document.getElementById("offerRideBtn").style.display = "inline-block";
-  }
-})();
-</script>
+    <script>
+      // topbar dropdown toggle (UI only)
+      const menuBtn = document.getElementById("menuBtn");
+      const menuDropdown = document.getElementById("menuDropdown");
 
-</body>
+      menuBtn.addEventListener("click", () => {
+        menuDropdown.classList.toggle("show");
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest(".menu")) {
+          menuDropdown.classList.remove("show");
+        }
+      });
+    </script>
+
+    <script>
+      (async () => {
+        const out = document.getElementById("out");
+        const userId = localStorage.getItem("userId");
+
+        if (!userId) {
+          out.textContent = "No userId found. Please login again.";
+          window.location.href = "/login";
+          return;
+        }
+
+        const res = await fetch("/users/" + userId);
+        out.textContent = "GET /users/" + userId + " -> " + res.status;
+
+        if (!res.ok) return;
+
+        const user = await res.json();
+        out.textContent += "\nemail=" + user.email + " hasCar=" + user.hasCar;
+
+        /* NEW: show username in dropdown (not clickable) */
+        document.getElementById("userNameText").textContent = user.email;
+
+        // show driver-only buttons
+        if (user.hasCar === true) {
+          document.getElementById("offerRideBtn").style.display = "inline-block";
+          document.getElementById("viewRequestsBtn").style.display = "inline-block";
+        }
+      })();
+    </script>
+  </body>
 </html>

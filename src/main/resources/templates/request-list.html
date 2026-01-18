@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Ride Requests</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+
+  <body>
+    <div class="app">
+      <h2>Passenger Ride Requests</h2>
+
+      <div id="list"></div>
+      <pre id="out"></pre>
+
+      <div class="info" style="margin-top: 10px;">
+        <a href="/home">Back</a>
+      </div>
+    </div>
+
+    <script>
+      (async () => {
+        const res = await fetch("/ride-requests");
+        if (!res.ok) {
+          document.getElementById("out").textContent = await res.text();
+          return;
+        }
+        const reqs = await res.json();
+        const box = document.getElementById("list");
+
+        if (reqs.length === 0) {
+          box.innerHTML = "<b>No requests yet.</b>";
+          return;
+        }
+
+        box.innerHTML = reqs
+          .filter((r) => r.status === "OPEN")
+          .map(
+            (r) => `
+              <div class="card">
+                <div><b>${r.fromLocation}</b> → <b>${r.toLocation}</b></div>
+                <div class="info" style="margin-top: 6px;">Earliest time: ${r.earliestDepartureTime}</div>
+                <div class="info">Passengers: ${r.passengerCount}</div>
+                <div style="margin-top: 10px;">
+                  <button onclick="acceptRequest(${r.id})">Accept</button>
+                </div>
+              </div>
+            `
+          )
+          .join("");
+      })();
+
+      async function acceptRequest(id) {
+        const driverId = localStorage.getItem("userId");
+        if (!driverId) {
+          alert("Please login again.");
+          window.location.href = "/login";
+          return;
+        }
+
+        const res = await fetch(
+          `/ride-requests/${id}/accept?driverId=${driverId}`,
+          { method: "POST" }
+        );
+
+        if (res.ok) {
+          alert("Accepted!");
+          window.location.reload();
+        } else {
+          alert(await res.text());
+        }
+      }
+    </script>
+  </body>
+</html>

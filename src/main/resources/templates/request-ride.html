@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
   <head>
-    <title>Offer a Ride</title>
-
+    <title>Request a Ride</title>
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -12,9 +11,9 @@
 
   <body>
     <div class="app">
-      <h2>Offer a Ride</h2>
+      <h2>Request a Ride</h2>
 
-      <form id="offerRideForm">
+      <form id="requestRideForm">
         <input
           id="fromLocation"
           name="fromLocation"
@@ -23,54 +22,38 @@
         />
         <input id="toLocation" name="toLocation" placeholder="To" required />
 
-        <label>Departure Time</label>
-        <input type="datetime-local" name="departureTime" required />
+        <label>Earliest Departure Time</label>
+        <input type="datetime-local" name="earliestDepartureTime" required />
 
-        <label>Available Seats</label>
-        <input type="number" name="availableSeats" min="1" required />
-
-        <label>Fuel consumption (L/100km)</label>
-        <input type="number" id="consumption" step="0.1" min="0" value="7" />
-
-        <label>Fuel price (€/L)</label>
-        <input type="number" id="fuelPrice" step="0.01" min="0" value="1.80" />
-
-        <label>Total Fuel Cost (€)</label>
+        <label>How many passengers?</label>
         <input
           type="number"
-          id="totalFuelCost"
-          name="totalFuelCost"
-          step="0.01"
-          min="0"
+          name="passengerCount"
+          min="1"
+          value="1"
           required
         />
 
-        <div id="routeInfo" class="info" style="margin-top: 8px;"></div>
-        <div id="costBreakdown" style="margin-top: 8px; font-weight: 600;"></div>
+        <div id="routeInfo" style="margin-top: 8px; font-weight: 600;"></div>
 
-        <p class="info" style="margin-top: 6px;">
-          Note: A €1 platform maintenance fee is charged when posting a ride.
-        </p>
-
-        <button type="submit">Post Ride</button>
+        <button type="submit">Post Request</button>
 
         <div class="info" style="margin-top: 10px;">
-          <a href="/home">Back</a>
+          <a href="/rides/search">Back</a>
         </div>
       </form>
 
-      <!-- Map + route info (ONLY ONCE) -->
+      <!-- Map -->
       <div id="map" style="height: 360px; width: 100%; margin-top: 16px;"></div>
 
       <pre id="out"></pre>
     </div>
 
-    <!-- Leaflet JS (load after DOM) -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
       document
-        .getElementById("offerRideForm")
+        .getElementById("requestRideForm")
         .addEventListener("submit", async (e) => {
           e.preventDefault();
           const form = new FormData(e.target);
@@ -83,15 +66,14 @@
           }
 
           const payload = {
-            driverId: Number(userId),
+            passengerId: Number(userId),
             fromLocation: (form.get("fromLocation") || "").trim(),
             toLocation: (form.get("toLocation") || "").trim(),
-            departureTime: form.get("departureTime"),
-            availableSeats: Number(form.get("availableSeats")),
-            totalFuelCost: Number(form.get("totalFuelCost")),
+            earliestDepartureTime: form.get("earliestDepartureTime"),
+            passengerCount: Number(form.get("passengerCount")),
           };
 
-          const res = await fetch("/rides", {
+          const res = await fetch("/ride-requests", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
@@ -102,10 +84,6 @@
           } else {
             document.getElementById("out").textContent = await res.text();
           }
-
-          /*document.getElementById("out").textContent = res.ok
-            ? ("Ride posted! " + JSON.stringify(await res.json(), null, 2))
-            : await res.text();*/
         });
     </script>
 
@@ -117,23 +95,6 @@
       }).addTo(map);
 
       let routeLine = null;
-
-      function updateCostBreakdown(totalFuelCost) {
-        const seats = Number(
-          document.querySelector('input[name="availableSeats"]').value || 0
-        );
-        const participants = 1 + seats; // driver + all available seats (estimate)
-        const platformFee = 1;
-
-        const fuelPerPerson = totalFuelCost / participants;
-        const totalPerPerson = fuelPerPerson + platformFee;
-
-        document.getElementById("costBreakdown").textContent =
-          `Total per person (${participants} people): €${totalPerPerson.toFixed(
-            2
-          )} ` +
-          `(Fuel: €${fuelPerPerson.toFixed(2)} + Platform fee: €1.00)`;
-      }
 
       async function tryRoute() {
         const from = document.getElementById("fromLocation").value.trim();
@@ -165,6 +126,8 @@
         );
 
         const routeData = await routeRes.json();
+        if (!routeData.routes || !routeData.routes.length) return;
+
         const coords = routeData.routes[0].geometry.coordinates.map((c) => [
           c[1],
           c[0],
@@ -175,40 +138,13 @@
         routeLine = L.polyline(coords).addTo(map);
         map.fitBounds(routeLine.getBounds());
 
-        const consumption = Number(
-          document.getElementById("consumption").value || 0
-        );
-        const fuelPrice = Number(
-          document.getElementById("fuelPrice").value || 0
-        );
-        const totalFuelCost = (distanceKm / 100) * consumption * fuelPrice;
-
-        document.getElementById("routeInfo").textContent =
-          `Distance: ${distanceKm.toFixed(
-            1
-          )} km | Total fuel cost: €${totalFuelCost.toFixed(2)}`;
-
-        document.getElementById("totalFuelCost").value =
-          totalFuelCost.toFixed(2);
-
-        // NEW: show total per person
-        updateCostBreakdown(totalFuelCost);
+        document.getElementById(
+          "routeInfo"
+        ).textContent = `Distance: ${distanceKm.toFixed(1)} km`;
       }
 
-      // auto update
       document.getElementById("fromLocation").addEventListener("blur", tryRoute);
       document.getElementById("toLocation").addEventListener("blur", tryRoute);
-      document.getElementById("consumption").addEventListener("input", tryRoute);
-      document.getElementById("fuelPrice").addEventListener("input", tryRoute);
-
-      document
-        .querySelector('input[name="availableSeats"]')
-        .addEventListener("input", () => {
-          const totalFuelCost = Number(
-            document.getElementById("totalFuelCost").value || 0
-          );
-          if (totalFuelCost > 0) updateCostBreakdown(totalFuelCost);
-        });
     </script>
   </body>
 </html>

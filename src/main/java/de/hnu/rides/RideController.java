@@ -95,4 +95,33 @@ public class RideController {
 
         return new RideResponse(saved.getId(), saved.getStatus().name());
     }
+    // ---------- LIST RIDES ----------
+   
+    public static class RideListItem {
+    public Long id;
+    public String fromLocation;
+    public String toLocation;
+    public String departureTime;
+    public int availableSeats;
+    public double totalFuelCost;
+    public String status;
+
+    public RideListItem(Ride r) {
+        this.id = r.getId();
+        this.fromLocation = r.getFromLocation();
+        this.toLocation = r.getToLocation();
+        this.departureTime = r.getDepartureTime() == null ? null : r.getDepartureTime().toString();
+        this.availableSeats = r.getAvailableSeats();
+        this.totalFuelCost = r.getTotalFuelCost();
+        this.status = r.getStatus() == null ? null : r.getStatus().name();
+    }
+    }
+
+    @GetMapping
+    public java.util.List<RideListItem> listRides() {
+    return rides.findAll().stream()
+        .map(RideListItem::new)
+        .toList();
+    }
+
 }

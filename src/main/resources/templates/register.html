@@ -1,83 +1,89 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-  <title>Register</title>
-</head>
-<body>
+  <head>
+    <title>Register</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
 
-<h2>Register</h2>
+  <body>
+    <div class="app">
+      <h2>Register</h2>
 
-<form id="registerForm">
+      <form id="registerForm">
+        <input name="FirstName" placeholder="First Name" />
+        <input name="LastName" placeholder="Last Name" />
+        <input name="email" placeholder="Email" />
+        <input name="password" type="password" placeholder="Password" />
+        <input name="NIDnumber" placeholder="National ID Number" />
 
-  <input name="FirstName" placeholder="First Name" /><br/><br/>
-  <input name="LastName" placeholder="Last Name" /><br/><br/>
-  <input name="email" placeholder="Email" /><br/><br/>
-  <input name="password" type="password" placeholder="Password" /><br/><br/>
-  <input name="NIDnumber" placeholder="National ID Number" /><br/><br/>
+        <label>
+          <input type="checkbox" name="hasCar" id="hasCar" />
+          I have a car
+        </label>
 
-  <label>
-    <input type="checkbox" name="hasCar" id="hasCar"> I have a car
-  </label><br><br>
+        <label>Driving License Number</label>
+        <input name="drivingLicenseNumber" id="dl" disabled />
 
-  <label>Driving License Number</label><br>
-  <input name="drivingLicenseNumber" id="dl" disabled><br><br>
+        <label>Car Number</label>
+        <input name="carNumber" id="carNo" disabled />
 
-  <label>Car Number</label><br>
-  <input name="carNumber" id="carNo" disabled><br><br>
+        <button type="submit">Create account</button>
 
-  <button type="submit">Create account</button>
-  <a href="/login">Back to login</a>
+        <div class="info" style="margin-top: 10px;">
+          <a href="/login">Back to login</a>
+        </div>
+      </form>
 
-</form>
+      <p id="out"></p>
+    </div>
 
-<p id="out"></p>
+    <script>
+      // toggle logic
+      const cb = document.getElementById("hasCar");
+      const dl = document.getElementById("dl");
+      const carNo = document.getElementById("carNo");
 
-<script>
-  // toggle logic
-  const cb = document.getElementById("hasCar");
-  const dl = document.getElementById("dl");
-  const carNo = document.getElementById("carNo");
+      cb.addEventListener("change", () => {
+        dl.disabled = !cb.checked;
+        carNo.disabled = !cb.checked;
 
-  cb.addEventListener("change", () => {
-    dl.disabled = !cb.checked;
-    carNo.disabled = !cb.checked;
+        if (!cb.checked) {
+          dl.value = "";
+          carNo.value = "";
+        }
+      });
 
-    if (!cb.checked) {
-      dl.value = "";
-      carNo.value = "";
-    }
-  });
+      // submit logic
+      document
+        .getElementById("registerForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const form = new FormData(e.target);
 
-  // submit logic
-  document.getElementById("registerForm").addEventListener("submit", async e => {
-    e.preventDefault();
-    const form = new FormData(e.target);
+          const payload = {
+            FirstName: (form.get("FirstName") || "").trim(),
+            LastName: (form.get("LastName") || "").trim(),
+            email: (form.get("email") || "").trim(),
+            password: (form.get("password") || "").trim(),
+            NIDnumber: (form.get("NIDnumber") || "").trim(),
 
-    const payload = {
-      FirstName: (form.get("FirstName") || "").trim(),
-      LastName: (form.get("LastName") || "").trim(),
-      email: (form.get("email") || "").trim(),
-      password: (form.get("password") || "").trim(),
-      NIDnumber: (form.get("NIDnumber") || "").trim(),
+            hasCar: form.get("hasCar") === "on",
+            drivingLicenseNumber: (form.get("drivingLicenseNumber") || "").trim(),
+            carNumber: (form.get("carNumber") || "").trim(),
+          };
 
-      hasCar: form.get("hasCar") === "on",
-      drivingLicenseNumber: (form.get("drivingLicenseNumber") || "").trim(),
-      carNumber: (form.get("carNumber") || "").trim()
-    };
+          const res = await fetch("/auth/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
 
-    const res = await fetch("/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-
-    if (res.ok) {
-      window.location.href = "/login";
-    } else {
-      document.getElementById("out").textContent = await res.text();
-    }
-  });
-</script>
-
-</body>
+          if (res.ok) {
+            window.location.href = "/login";
+          } else {
+            document.getElementById("out").textContent = await res.text();
+          }
+        });
+    </script>
+  </body>
 </html>

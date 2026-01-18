@@ -33,7 +33,7 @@ public class PageController {
 
     @GetMapping("/rides/search")
     public String searchRidePage() {
-        return "search-ride";
+        return "ride-search";
     }
 
     @GetMapping("/rides/luggage")
@@ -58,5 +58,17 @@ public class PageController {
 
         return "redirect:/login";
 }   // since we have not used @requestparam we used @requestbody */
+
+    @GetMapping("/rides/request")
+    public String requestRidePage() {
+        return "request-ride";
+    }
+    // list of ride requests page
+        @GetMapping("/rides/requests")
+    public String requestsPage() {
+        return "request-list";
+    }
+
+
 
 }
