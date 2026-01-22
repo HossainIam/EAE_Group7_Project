@@ -1,15 +1,11 @@
 /* =========================================================
-   RIDE SHARE MOBILE APP — GREEN THEME (ORGANIZED CSS)
-   Notes:
-   - Same visual behavior as your current CSS
-   - Adds theme variables (easy to maintain)
-   - Keeps your class names unchanged
+   Move With Me - CSS Stylesheet
    ========================================================= */
 
 
-/* =========================
+/* 
    1) THEME VARIABLES
-   ========================= */
+    */
 :root {
   /* Brand Greens */
   --green-900: #1b5e20;
@@ -99,9 +95,8 @@ body {
 }
 
 
-/* =========================
-   4) MENU / DROPDOWN
-   ========================= */
+/* 4) MENU / DROPDOWN*/
+
 .menu {
   position: relative;
 }
@@ -154,8 +149,7 @@ body {
 .dropdown button:hover {
   background-color: var(--surface-soft);
 }
-
-/* logout should look like danger text */
+/* logout button special */
 .dropdown .logout-btn {
   background: none;
   color: var(--danger-600);
@@ -168,9 +162,7 @@ body {
 }
 
 
-/* =========================
-   5) TYPOGRAPHY
-   ========================= */
+/* 5) TYPOGRAPHY*/
 h2 {
   color: var(--green-700);
   margin-bottom: 14px;
@@ -188,9 +180,7 @@ h2 {
 }
 
 
-/* =========================
-   6) FORMS / INPUTS
-   ========================= */
+/* 6) FORMS / INPUTS */
 form {
   background: var(--surface);
   padding: 18px;
@@ -216,9 +206,7 @@ input:focus {
 }
 
 
-/* =========================
-   7) BUTTONS
-   ========================= */
+/*  7) BUTTONS */
 button {
   width: 100%;
   background: linear-gradient(135deg, var(--green-700), var(--green-600));
@@ -265,9 +253,7 @@ button:hover {
 }
 
 
-/* =========================
-   8) CARDS / LIST ITEMS
-   ========================= */
+/*  8) CARDS / LIST ITEMS */
 .card {
   background: var(--surface);
   padding: 16px;
@@ -278,18 +264,14 @@ button:hover {
 }
 
 
-/* =========================
-   9) MAP
-   ========================= */
+/*  9) MAP */
 #map {
   border-radius: var(--radius-lg);
   margin-top: 14px;
 }
 
 
-/* =========================
-   10) LINKS
-   ========================= */
+/*   10) LINKS */
 a {
   color: var(--green-700);
   text-decoration: none;
@@ -300,16 +282,12 @@ a:hover {
 }
 
 
-/* =========================
-   11) FOOTER SPACE
-   ========================= */
 .footer-space {
   height: 30px;
 }
 
-/* =========================
-   APP LOGO (CENTERED & BALANCED)
-   ========================= */
+
+ 
 /* --- LOGO FINAL OVERRIDE --- */
 .logo-container {
   display: flex !important;
@@ -320,9 +298,8 @@ a:hover {
 }
 
 .logo {
-  width: 120px !important;   /* change to 90/100/110 if you want smaller */
+  width: 120px !important;   
   height: auto !important;
   display: block !important;
 }
-
 

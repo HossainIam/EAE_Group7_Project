@@ -51,7 +51,7 @@ public class RideController {
         User driver = users.findById(req.driverId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid driver"));
 
-        // ✅ BUSINESS RULE ENFORCEMENT
+        // BUSINESS RULES
         if (!driver.isHasCar()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "Only users with a car can offer rides");

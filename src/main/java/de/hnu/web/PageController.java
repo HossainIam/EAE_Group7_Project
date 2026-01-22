@@ -17,14 +17,6 @@ public class PageController {
         return "login";
     }
 
-   /* @PostMapping("/login")
-    public String login(@RequestParam String username,
-                        @RequestParam String password) {
-
-        // request param means we get the values from the form with the names "username" and "password"
-
-        return "redirect:/home";
-    } */ 
 
     @GetMapping("/home")
     public String home() {
@@ -52,13 +44,7 @@ public class PageController {
          return "register";
 }
 
-   /* @PostMapping("/register") 
-    public String register(@RequestParam String username,
-                       @RequestParam String password) {
-
-        return "redirect:/login";
-}   // since we have not used @requestparam we used @requestbody */
-
+    // request ride page
     @GetMapping("/rides/request")
     public String requestRidePage() {
         return "request-ride";

@@ -1,14 +1,10 @@
 package de.hnu.auth;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
-
 import de.hnu.data.User;
 import de.hnu.data.UserRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 
 // @RequestBody this is telling spring to map json that data sended from client to this object 
@@ -24,7 +20,7 @@ public class AuthController {
         this.users = users;
     }
 
-    //  Data Transfer Objects ---
+    // --- DTOs means Data Transfer Objects ---
     // AuthRequest carries data FROM client TO server.
     public static class AuthRequest {
         public String FirstName;
@@ -47,7 +43,9 @@ public class AuthController {
             this.email = email;
         }
     }
-    
+    // requestbody to map json data
+    // req is an object created by Spring using Jackson after reading JSON from the request body.
+    // The name 'req' is chosen by me. @RequestBody tells Spring to map JSON into this object.
    @PostMapping("/register")
     public AuthResponse register(@RequestBody AuthRequest req) {
 

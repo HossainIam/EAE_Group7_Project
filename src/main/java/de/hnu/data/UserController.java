@@ -8,6 +8,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestController           // This class handles REST API requests and returns data in JSON format
 @RequestMapping("/users") // Base path for controller.
+
 //Repository injection
 public class UserController {
 
