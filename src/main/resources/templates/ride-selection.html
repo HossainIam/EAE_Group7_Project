@@ -64,7 +64,7 @@
         </button>
       </div>
 
-      <pre id="out"></pre>
+      <!--<pre id="out"></pre>-->
     </div>
 
     <script>
@@ -84,33 +84,28 @@
     </script>
 
     <script>
-      (async () => {
-        const out = document.getElementById("out");
-        const userId = localStorage.getItem("userId");
+  (async () => {
+    const userId = localStorage.getItem("userId");
 
-        if (!userId) {
-          out.textContent = "No userId found. Please login again.";
-          window.location.href = "/login";
-          return;
-        }
+    if (!userId) {
+      window.location.href = "/login";
+      return;
+    }
 
-        const res = await fetch("/users/" + userId);
-        out.textContent = "GET /users/" + userId + " -> " + res.status;
+    const res = await fetch("/users/" + userId);
+    if (!res.ok) return;
 
-        if (!res.ok) return;
+    const user = await res.json();
 
-        const user = await res.json();
-        out.textContent += "\nemail=" + user.email + " hasCar=" + user.hasCar;
+    // show username in dropdown
+    document.getElementById("userNameText").textContent = user.email;
 
-        /* NEW: show username in dropdown (not clickable) */
-        document.getElementById("userNameText").textContent = user.email;
-
-        // show driver-only buttons
-        if (user.hasCar === true) {
-          document.getElementById("offerRideBtn").style.display = "inline-block";
-          document.getElementById("viewRequestsBtn").style.display = "inline-block";
-        }
-      })();
-    </script>
+    // show driver-only buttons
+    if (user.hasCar === true) {
+      document.getElementById("offerRideBtn").style.display = "inline-block";
+      document.getElementById("viewRequestsBtn").style.display = "inline-block";
+    }
+  })();
+</script>
   </body>
 </html>
