@@ -55,6 +55,8 @@ body {
   /* center app like mobile */
   display: flex;
   justify-content: center;
+  align-items: center;     /* ✅ add this */
+  box-sizing: border-box;  /* ✅ add this */
 }
 
 .app {
@@ -172,6 +174,7 @@ body {
 h2 {
   color: var(--green-700);
   margin-bottom: 14px;
+  text-align: center;   /* ✅ ADD THIS */
 }
 
 .info {
@@ -303,3 +306,23 @@ a:hover {
 .footer-space {
   height: 30px;
 }
+
+/* =========================
+   APP LOGO (CENTERED & BALANCED)
+   ========================= */
+/* --- LOGO FINAL OVERRIDE --- */
+.logo-container {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+  margin: 8px 0 10px !important;
+}
+
+.logo {
+  width: 120px !important;   /* change to 90/100/110 if you want smaller */
+  height: auto !important;
+  display: block !important;
+}
+
+
